@@ -32,4 +32,6 @@ go.work.sum
 # .idea/
 # .vscode/
 dmr_uuid.txt
+
+bin
 .trae/

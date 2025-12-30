@@ -17,7 +17,7 @@ MAIN_PACKAGE := .
 
 # Directories
 OUTPUT_DIR := output
-BIN_DIR := $(OUTPUT_DIR)/bin
+BIN_DIR := bin
 LOG_DIR := $(OUTPUT_DIR)/log
 
 # Build Flags
@@ -27,7 +27,7 @@ LDFLAGS := -s -w \
 	-X main.gitCommit=$(GIT_COMMIT) \
 	-X main.goVersion=$(GO_VERSION)
 
-GOBUILD_FLAGS := -ldflags="$(LDFLAGS)"
+GOBUILD_FLAGS :=-buildvcs=false -trimpath  -ldflags="$(LDFLAGS)"
 
 # Development Configuration
 GO_ENV ?= production
@@ -39,11 +39,28 @@ GO_ENV ?= production
 # Build Targets
 # ==============================================================================
 
-.PHONY: build
-build: clean prepare ## Build the main binary
-	@echo "Building $(BINARY_NAME) $(VERSION)..."
-	@GOWORK=off $(GO) build $(GOBUILD_FLAGS) -o $(BIN_DIR)/$(BINARY_NAME) $(MAIN_PACKAGE)
-	@echo "Build completed: $(BIN_DIR)/$(BINARY_NAME)"
+# Build all platforms
+.PHONY: build-all
+build-all: build-linux-arm64 build-linux-amd64 build-windows-amd64
+
+# Build for Linux ARM64 (musl)
+.PHONY: build-linux-arm64
+build-linux-arm64:
+	@echo "Building for Linux ARM64..."
+	GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build $(GOBUILD_FLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm64 main.go
+
+# Build for Linux AMD64 (musl)
+.PHONY: build-linux-amd64
+build-linux-amd64:
+	@echo "Building for Linux AMD64..."
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(GOBUILD_FLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-amd64 main.go
+
+# Build for Windows AMD64
+.PHONY: build-windows-amd64
+build-windows-amd64:
+	@echo "Building for Windows AMD64..."
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build $(GOBUILD_FLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-windows-amd64.exe main.go
+
 
 .PHONY: build-dev
 build-dev: prepare ## Build development binary (with debug info)

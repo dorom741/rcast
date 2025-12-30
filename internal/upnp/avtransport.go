@@ -98,12 +98,13 @@ func AVTransportHandler(st *state.PlayerState, cfg config.Config) http.HandlerFu
 				WriteSOAPError(w, 714, "No content selected")
 				return
 			}
+			unescapedUri := html.UnescapeString(uri)
 
 			// Start playback asynchronously
 			go func() {
 				playerKey := strings.SplitN(r.RemoteAddr, ":", 2)[0]
-				if err := st.GetPlayer(playerKey).Play(ctx, uri, st.Volume); err != nil {
-					log.CtxError(ctx, "iina play error: %v", err)
+				if err := st.GetPlayer(playerKey).Play(ctx, unescapedUri, st.Volume); err != nil {
+					log.CtxError(ctx, "player Play error: %v", err)
 					monitoring.GetMetrics().RecordPlayerError()
 					// Note: Can't send error response here since HTTP response already sent
 					return

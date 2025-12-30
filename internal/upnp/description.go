@@ -7,6 +7,7 @@ const (
 	AVTransportType       = "urn:schemas-upnp-org:service:AVTransport:1"
 	RenderingType         = "urn:schemas-upnp-org:service:RenderingControl:1"
 	ConnectionManagerType = "urn:schemas-upnp-org:service:ConnectionManager:1"
+	ContentDirectoryType = "urn:schemas-upnp-org:service:ContentDirectory:1"
 )
 
 func DeviceDescriptionXML(base, deviceUUID string) string {

@@ -59,8 +59,19 @@ func (s *PlayerState) GetPlayer(key string) player.Player {
 		entry.lastUsed = now
 		return entry.player
 	} else {
+		// 根据配置选择播放器类型
+		var p player.Player
+		switch s.cfg.PlayerType {
+		case "aria2":
+			p = player.NewAria2Player(s.cfg.Aria2RPCURL, s.cfg.Aria2RPCPassword, s.cfg.Aria2DownloadPath)
+		case "iina":
+			fallthrough
+		default:
+			p = player.NewIINAPlayer(s.cfg.IINAFullscreen)
+		}
+
 		entry := &playerEntry{
-			player:    player.NewIINAPlayer(s.cfg.IINAFullscreen),
+			player:    p,
 			lastUsed:  now,
 			createdAt: now,
 		}

@@ -71,7 +71,9 @@ func runServer(ctx context.Context, cfg config.Config) error {
 		log.Error("no IPv4: %v", err)
 		return err
 	}
+
 	baseURL := fmt.Sprintf("http://%s:%d", ip, cfg.HTTPPort)
+	log.Info("baseURL: %s", baseURL)
 
 	// 状态
 	st := state.New(ctx, cfg)
@@ -88,8 +90,7 @@ func runServer(ctx context.Context, cfg config.Config) error {
 	// SSDP
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	go ssdp.Announce(ctx, baseURL, deviceUUID, serverName)
-	go ssdp.SearchResponder(ctx, baseURL, deviceUUID, serverName)
+	go ssdp.StartSSDP(ctx, baseURL, deviceUUID, serverName)
 
 	// 启动 HTTP
 	go func() {
